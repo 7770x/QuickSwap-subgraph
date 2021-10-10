@@ -8,17 +8,14 @@ const USDC_WETH_PAIR = '0x853ee4b2a13f8a742d64c8f088be7ba2131f670d' // created 1
 const DAI_WETH_PAIR = '0x4a35582a710e1f4b2030a3f826da20bfb6703c09' // created block 10042267
 const USDT_WETH_PAIR = '0xf6422b997c7f54d1c6a6e103bcb1499eea0a7046' // created block 10093341
 
-
 export function getEthPriceInUSD(): BigDecimal {
   //For now we will only use USDC_WETH pair for ETH prices
-  let usdcPair = Pair.load(USDC_WETH_PAIR);
+  let usdcPair = Pair.load(USDC_WETH_PAIR)
   if (usdcPair !== null) {
     return usdcPair.token0Price
-  }
-  else {
+  } else {
     return ZERO_BD
   }
-  
 
   /**let daiPair = Pair.load(DAI_WETH_PAIR) // dai is token0
   let usdtPair = Pair.load(USDT_WETH_PAIR) // usdt is token1
@@ -63,14 +60,14 @@ let WHITELIST: string[] = [
 ]
 
 export function isOnWhitelist(token: string): boolean {
-  for(var i = 0; i < WHITELIST.length; i++) {
-    if(token == WHITELIST[i]) return true
+  for (let i = 0; i < WHITELIST.length; i++) {
+    if (token == WHITELIST[i]) return true
   }
   return false
 }
 
 // minimum liquidity for price to get tracked
-let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
+let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('0')
 
 /**
  * Search through graph to find derived Eth per token.
@@ -84,16 +81,16 @@ export function findEthPerToken(token: Token): BigDecimal {
   // loop through whitelist and check if paired with any
   let whitelist = token.whitelist
   for (let i = 0; i < whitelist.length; ++i) {
-      let pairAddress = whitelist[i]
-      let pair = Pair.load(pairAddress)
-      if (pair.token0 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token1 = Token.load(pair.token1)
-        return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
-      }
-      if (pair.token1 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token0 = Token.load(pair.token0)
-        return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
-      }
+    let pairAddress = whitelist[i]
+    let pair = Pair.load(pairAddress)
+    if (pair.token0 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+      let token1 = Token.load(pair.token1)
+      return pair.token1Price.times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
+    }
+    if (pair.token1 == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+      let token0 = Token.load(pair.token0)
+      return pair.token0Price.times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+    }
   }
   return ZERO_BD // nothing was found return 0
 }
